@@ -93,10 +93,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">Asynchronous IO</div>  </div>
 <div class="ingroups"><a class="el" href="group__CAPI__USB__HOST__MODULE.html">USB Host</a></div></div><!--header-->
 <div class="contents">
-<hr/><a name="details" id="details"></a><h2> </h2>
-<p>This API is used to perform asynchronous operations. </p>
-<h2><a class="anchor" id="CAPI_USB_HOST_ASYNC_MODULE_OVERVIEW"></a>
-Overview</h2>
+<hr/><a name="details" id="details"></a><h2><a class="anchor" id="CAPI_USB_HOST_ASYNC_MODULE_OVERVIEW"></a></h2>
+<p>This API is used to perform asynchronous operations. See <a href="../../../guides/connectivity/usb-host">the guide</a> for examples. </p>
+<h2></h2>
 <p>Asynchronous transfers are performed by submitting previously prepared transfer handle (<a class="el" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#ga1f956271e363bdb4c9bd0550c26499d0" title="USB asynchronous transfer handle.">usb_host_transfer_h</a>). When the transfer is finished, the callback set by user is called. Transfer handle contains all transfer parameters and, when configured, can be submitted multiple times. Most of parameters required for asynchronous transfers match those from synchronous transfer.</p>
 <p>Like in synchronous transfer, you must first obtain the endpoint handle. Then you can create a transfer handle with desired parameters. </p>
 <div class="fragment"><pre class="fragment"> <a class="code" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#ga1f956271e363bdb4c9bd0550c26499d0" title="USB asynchronous transfer handle.">usb_host_transfer_h</a> transfer;
@@ -158,39 +157,7 @@ Isochronous transfers</h2>
 </pre></div><p>Before submitting the transfer you must setup isochronous packets lengths (and data, if making out transfer). </p>
 <div class="fragment"><pre class="fragment"> <span class="keywordflow">for</span> (i = 0; i &lt; num_iso_packets; ++i) {
     ret = <a class="code" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#gae9d6ee400258cfd6eb7f5b4e653b9dfe" title="Sets an isochronous packet length.">usb_host_transfer_set_iso_packet_length</a>(transfer, i, packet_lenght);
-    <span class="comment">//...</span>
 
-    ret = <a class="code" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#ga575ca11e405128a328880d34c5a685eb" title="Gets data buffer of isochronous packet.">usb_host_transfer_get_iso_packet_data</a>(transfer, i, &amp;data, &amp;len);
-    <span class="comment">// fill received buffer with your data</span>
-    <span class="comment">// ...</span>
- }
-</pre></div><p>Similarly, you can obtain received data in callback function by calling <a class="el" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#ga575ca11e405128a328880d34c5a685eb" title="Gets data buffer of isochronous packet.">usb_host_transfer_get_iso_packet_data()</a>. Note, that length of received data can be different than length of buffer space set for an isochronous packet.</p>
-<p>Each packet has its own status code. Check them by calling <a class="el" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#gafbc6f8a6cf43034aad3a2767423b1f60" title="Gets an isochronous packet status.">usb_host_transfer_get_iso_packet_status()</a>.</p>
-<h2><a class="anchor" id="CAPI_USB_HOST_ASYNC_MODULE_CONTROL"></a>
-Control transfers</h2>
-<p>You can make asynchronous control transfers as well. They use the same data type as other asynchronous transfers (<a class="el" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#ga1f956271e363bdb4c9bd0550c26499d0" title="USB asynchronous transfer handle.">usb_host_transfer_h</a>) and can be handled in similar way.</p>
-<p>A control transfer need specific format of data in buffer, i.e. first 8 bytes of buffer need to contain a setup packet. You can find more informations about setup packets in usb protocol specification. This API provides functions helping with filling the setup packet.</p>
-<div class="fragment"><pre class="fragment"> <span class="comment">// Create a transfer handle</span>
- ret = <a class="code" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#gaf75e57be83cf84fc7e5b61135bf39fc1" title="Prepares an asynchronous USB control transfer.">usb_host_create_control_transfer</a>(dev, transfer_callback, data, length, user_data, timeout, &amp;transfer);
- <span class="keywordflow">if</span> (ret &lt; 0)
-     error();
-
- <span class="comment">// Set setup packet member values</span>
-
- <a class="code" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#ga4a7df6ac9fed679d09a2f2910ca643ff" title="Sets request type for control transfer setup packet.">usb_host_control_transfer_set_request_type</a>(transfer, bm_request_type);
- <a class="code" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#gacbef6e1aa8b283b9d9e4bcc10e22c0da" title="Sets request field for control transfer setup packet.">usb_host_control_transfer_set_request</a>(transfer, b_request);
- <a class="code" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#ga630fdfab36578f3d6c070b5a1278a51b" title="Sets w_value field for control transfer setup packet.">usb_host_control_transfer_set_value</a>(transfer, w_value);
- <a class="code" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#ga18e514e16ee5b17b93d9a7c16bbe89bd" title="Sets w_index field for control transfer setup packet.">usb_host_control_transfer_set_index</a>(transfer, w_index);
-
- <span class="comment">// Submit the transfer</span>
- ret = <a class="code" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#gad47e600657962515f89c2d727b2bfbfb" title="Submits an asynchronous USB transfer.">usb_host_transfer_submit</a>(transfer);
- <span class="keywordflow">if</span> (ret &lt; 0)
-     error();
-
- <span class="comment">// ...</span>
- <span class="comment">// Destroy the transfer handle when no longer needed</span>
- ret = <a class="code" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#gab2d439286065258cbc9b1c469a4626db" title="Destroys an asynchronous transfer structure.">usb_host_transfer_destroy</a>(transfer);
-</pre></div><p>When receiving data from control transfer, remember that first 8 bytes of buffer are filled with setup packet. To obtain pointer to actual data, use <a class="el" href="group__CAPI__USB__HOST__ASYNC__MODULE.html#gacdab1bc658867d7c40f40561a443967a" title="Gets the *control* transfer data.">usb_host_control_transfer_get_data()</a>. </p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
